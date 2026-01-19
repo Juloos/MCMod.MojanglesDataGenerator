@@ -5,7 +5,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.font.FontManager;
 import net.minecraft.client.gui.font.FontSet;
 import net.minecraft.client.gui.font.providers.UnihexProvider;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Tuple;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @Mixin(FontManager.class)
 public abstract class MojanglesFunction_FontManagerMixin {
-    @Shadow @Final private Map<ResourceLocation, FontSet> fontSets;
+    @Shadow @Final private Map<Identifier, FontSet> fontSets;
 
     @Inject(
             method = "apply",
@@ -37,7 +37,7 @@ public abstract class MojanglesFunction_FontManagerMixin {
             provider.getSupportedGlyphs().forEach(glyphCode -> {
                 if (Character.toString(glyphCode).equals("\n") || Character.toString(glyphCode).equals("\r"))
                     return;
-                GlyphInfo glyph = provider.getGlyph(glyphCode);
+                GlyphInfo glyph = provider.getGlyph(glyphCode).info();
                 if (!(provider instanceof UnihexProvider))
                     mojangles.putIfAbsent(glyphCode, new Tuple<>(glyph.getAdvance(false), glyph.getAdvance(true)));
                 unifont.putIfAbsent(glyphCode, new Tuple<>(glyph.getAdvance(false), glyph.getAdvance(true)));
